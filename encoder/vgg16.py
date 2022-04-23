@@ -1,7 +1,8 @@
 import torchvision.models as models
 from torch import nn
+import torch
 
-
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 class VGG16(nn.Module):
 
