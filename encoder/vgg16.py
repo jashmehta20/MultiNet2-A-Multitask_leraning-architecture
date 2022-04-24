@@ -1,8 +1,10 @@
 import torchvision.models as models
 from torch import nn
 import torch
+from zmq import device
 
-device = 'cuda' if torch.cuda.is_available() else 'cpu'
+# device = 'cuda' if torch.cuda.is_available() else 'cpu'
+device = 'cpu'
 
 class VGG16(nn.Module):
 
