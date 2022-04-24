@@ -17,7 +17,7 @@ device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 LEARNING_RATE = 0.000001
 BATCH_SIZE = 2
-NUM_EPOCHS = 1
+NUM_EPOCHS = 100
 to_pil = transforms.ToPILImage()
 
 def val():
@@ -84,7 +84,7 @@ for epoch in range(NUM_EPOCHS):
         loss.backward()
         optimizer.step()
 
-    print(f"dice_score = {val()} epoch = {epoch}")
+    print(f"dice_score = {val()} ---- epoch = {epoch}")
 
     if epoch%10==0:
         torch.save({"epoch":epoch, "model_state_dict":model.state_dict(),
