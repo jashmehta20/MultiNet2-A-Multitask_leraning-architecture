@@ -38,10 +38,14 @@ class PascalVOC(Dataset):
         seg_label = seg_label.convert("RGB")
         seg_label = seg_label.resize(self.resize)
         seg_label = np.array(seg_label)
-        seg_target = np.ones((self.n_class, self.resize[0], self.resize[1]))*3
+        channel_list = []
         
         for img_class, code in codes.items():
-            seg_target[classes[img_class]-1, np.where(np.all(seg_label == code, axis=-1))[:2]] = classes[img_class]
+            seg_target = np.zeros((512,512))
+            seg_target[np.where(np.all(seg_label==code, axis=-1))]=1
+            channel_list.append(seg_target)
+
+        seg_target = np.reshape(np.concatenate((channel_list[0],channel_list[1], channel_list[2])), (-1,512,512))
 
         classification_label = self.df["classification"][index]-1
         preprocess = transforms.Compose([
