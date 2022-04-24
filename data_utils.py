@@ -3,10 +3,10 @@ import pandas as pd
 import numpy as np
 from os.path import join as osp
 
-DEETECTION_DIR = r"C:\Users\neetm\Desktop\DL\pascal\VOCdevkit\VOC2012\Annotations"
-CLASSIFICATION_DIR = r"C:\Users\neetm\Desktop\DL\pascal\VOCdevkit\VOC2012\ImageSets\Main"
-SEGMENTATION_DIR = r"C:\Users\neetm\Desktop\DL\pascal\VOCdevkit\VOC2012\SegmentationClass"
-IMAGE_DIR = r"C:\Users\neetm\Desktop\DL\pascal\VOCdevkit\VOC2012\JPEGImages"
+DEETECTION_DIR = r"/content/VOCdevkit/VOC2012/Annotations"
+CLASSIFICATION_DIR = r"/content/VOCdevkit/VOC2012/ImageSets/Main"
+SEGMENTATION_DIR = r"/content/VOCdevkit/VOC2012/SegmentationClass"
+IMAGE_DIR = r"/content/VOCdevkit/VOC2012/JPEGImages"
 SEG_LIST = os.listdir(SEGMENTATION_DIR)
 DET_LIST = os.listdir(DEETECTION_DIR)
 
