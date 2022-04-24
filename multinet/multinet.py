@@ -1,23 +1,21 @@
 from torch import nn
 from decoders import ClassificationDecoder, SegmentationDecoder, DetectionDecoder
-from encoder import VGG16
+from decoders.segmentation_decoder import FCN8s
+from encoder.vgg16 import VGGNet
 
 class Multinet(nn.Module):
 
     def __init__(self, num_classes) -> None:
         super(Multinet, self).__init__()
 
-        self.encoder = VGG16()
-        self.seg_decoder = SegmentationDecoder(num_classes=num_classes)
-        self.classification_decoder = ClassificationDecoder(in_channels=512, num_classes=num_classes)
-        # self.detection_decoder = DetectionDecoder()
+        self.encoder = VGGNet()
+        self.seg_decoder = FCN8s(n_class=num_classes)
+
 
     def forward(self, x):
 
-        encoder_output, scale_1_output, scale_2_output = self.encoder(x)
-        seg_output = self.seg_decoder(encoder_output, scale_1_output, scale_2_output)
-        class_output = self.classification_decoder(encoder_output)
-        # detection_output = self.detection_decoder(encoder_output)
+        x = self.encoder(x)
+        seg_out = self.seg_decoder(x)
 
-        return seg_output, class_output
+        return seg_out
 

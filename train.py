@@ -3,7 +3,6 @@ import torch
 from loss.loss import MultinetLoss
 
 from multinet import Multinet
-from encoder import VGG16
 from torchvision.transforms import transforms
 from torch.utils.data import DataLoader
 import torch.optim as optim
@@ -13,6 +12,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import torchmetrics.functional as F
 from scipy.spatial.distance import dice
+from torch.optim import lr_scheduler
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 LEARNING_RATE = 0.000001
@@ -69,21 +69,21 @@ val_loader = DataLoader(dataset=val_dataset, batch_size=BATCH_SIZE, shuffle=True
 
 
 
-model = Multinet(num_classes=3).to(device)
-criteria = MultinetLoss()
+model = Multinet(num_classes=4).to(device)
+criteria = torch.nn.BCEWithLogitsLoss()
 optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
-
+scheduler = lr_scheduler.StepLR(optimizer, step_size=50, gamma=0.5)
 to_image = transforms.ToPILImage()
 
 for epoch in range(NUM_EPOCHS):
-    for idx, (image, seg_label, class_label) in enumerate(train_dataloader):
+    for idx, (image, seg_label) in enumerate(train_dataloader):
 
-        image, seg_label, class_label = image.to(device), seg_label.to(device), class_label.to(device)
-        seg_pred, class_pred = model(image)
-        loss = criteria(seg_label, seg_pred, class_label, class_pred)
+        image, seg_label = image.to(device), seg_label.to(device)
+        seg_pred = model(image)
+        loss = criteria(seg_pred, seg_label)
         loss.backward()
         optimizer.step()
-
+        print(idx)
     print(f"dice_score = {val()} ---- epoch = {epoch}")
 
     if epoch%10==0:

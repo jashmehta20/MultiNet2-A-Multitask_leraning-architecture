@@ -12,11 +12,12 @@ import cv2
 from PIL import Image
 
 
-classes = {"bus":0, "bicycle":1, "car":2}
+classes = {"bus":0, "bicycle":1, "car":2, "background":3}
 bicycle = [0,128,0]
 car = [128,128,128]
 bus = [0,128,128]
-codes = {"bus":bus, "bicycle":bicycle, "car":car}
+background = [0,0,0]
+codes = {"bus":bus, "bicycle":bicycle, "car":car, 'background':background}
 
 class PascalVOC(Dataset):
 
@@ -45,12 +46,11 @@ class PascalVOC(Dataset):
             seg_target[np.where(np.all(seg_label==code, axis=-1))]=1
             channel_list.append(seg_target)
 
-        seg_target = np.reshape(np.concatenate((channel_list[0],channel_list[1], channel_list[2])), (-1,512,512))
+        seg_target = np.reshape(np.concatenate((channel_list[0],channel_list[1], channel_list[2], channel_list[3])), (-1,512,512))
 
-        classification_label = self.df["classification"][index]-1
         preprocess = transforms.Compose([
-            transforms.ToTensor()
-            # transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
         ])
         image = preprocess(image)
         seg_target = torch.from_numpy(seg_target)
@@ -58,5 +58,5 @@ class PascalVOC(Dataset):
             image = self.transform(image)
             seg_target = self.transform(seg_target)
         
-        return image, seg_target, classification_label
+        return image, seg_target
         
