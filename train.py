@@ -13,9 +13,10 @@ import matplotlib.pyplot as plt
 import torchmetrics.functional as F
 from scipy.spatial.distance import dice
 from torch.optim import lr_scheduler
+torch.cuda.empty_cache()
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-LEARNING_RATE = 0.00001
+LEARNING_RATE = 0.0001
 BATCH_SIZE = 4
 NUM_EPOCHS = 100
 num_class = 21
@@ -60,11 +61,15 @@ def visualize(pred, target):
 
 # image_transforms = transforms.Compose([transforms.Resize((375,500))])
 train_dataset = PascalVOC(csv_loc="train.csv", img_resize=(512,512), num_classes=3)
-train_len = int(len(train_dataset)*data_split) 
-val_len = len(train_dataset)-train_len
-train_dataset, val_dataset = torch.utils.data.random_split(train_dataset, [train_len, val_len])
+
+# train_len = int(len(train_dataset)*data_split) 
+# val_len = len(train_dataset)-train_len
+train_len = 1864
+val_len = 466
+test_len = len(train_dataset) - train_len - val_len
+train_dataset, val_dataset, test_dataset = torch.utils.data.random_split(train_dataset, [train_len, val_len, test_len])
 train_dataloader = DataLoader(dataset=train_dataset, batch_size=BATCH_SIZE, shuffle=True, drop_last=True)
-val_loader = DataLoader(dataset=val_dataset, batch_size=BATCH_SIZE, shuffle=True, drop_last=True)
+val_loader = DataLoader(dataset=val_dataset, batch_size=1, shuffle=True, drop_last=True)
 
 
 

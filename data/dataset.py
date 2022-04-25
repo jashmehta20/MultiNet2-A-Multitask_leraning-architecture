@@ -30,19 +30,19 @@ codes = {
                "dog":[64, 0, 128], # dog
                "horse":[192, 0, 128], # horse
                "motorbike":[64, 128, 128], # motorbike
-               "person":[192, 128, 128], # person
+               "person":[128,128,192], # person
                "potted_plant":[0, 64, 0], # potted plant
                "sheep":[128, 64, 0], # sheep
                "sofa":[0, 192, 0], # sofa
                "train":[128, 192, 0], # train
                "monitor":[0, 64, 128] # tv/monitor
 }
-k=0
-for i,j in codes.items():
-    j.reverse()
-    codes[i] = j
-    classes[i]=k
-    k+=1
+# k=0
+# for i,j in codes.items():
+#     j.reverse()
+#     codes[i] = j
+#     classes[i]=k
+#     k+=1
 
 
 class PascalVOC(Dataset):
@@ -50,7 +50,7 @@ class PascalVOC(Dataset):
     def __init__(self, csv_loc, img_resize, num_classes, transform=None) -> None:
         super(PascalVOC, self).__init__()
         self.df = pd.read_csv(csv_loc)
-        self.df = self.df.iloc[:200]
+        # self.df = self.df.iloc[:200]
         self.transform = transform
         self.resize = img_resize
         self.n_class = num_classes
