@@ -1,1 +1,0 @@
-from data.dataset import PascalVOC

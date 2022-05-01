@@ -76,50 +76,38 @@ def normal_error(x_pred, x_output):
 """
 
 
-def multi_task_trainer(train_loader, test_loader, multi_task_model, device, optimizer, scheduler, opt, total_epoch=200):
+def multi_net_trainer(train_loader, test_loader, multi_task_model, device, optimizer, scheduler, opt, n_class=13):
     train_batch = len(train_loader)
     test_batch = len(test_loader)
-    T = opt.temp
-    avg_cost = np.zeros([total_epoch, 24], dtype=np.float32)
-    lambda_weight = np.ones([3, total_epoch])
-    for index in range(total_epoch):
+    avg_cost = np.zeros([opt.epochs, 24], dtype=np.float32)
+    print("starting training")
+    for index in range(opt.epochs):
         cost = np.zeros(24, dtype=np.float32)
-
-        # apply Dynamic Weight Average
-        if opt.weight == 'dwa':
-            if index == 0 or index == 1:
-                lambda_weight[:, index] = 1.0
-            else:
-                w_1 = avg_cost[index - 1, 0] / avg_cost[index - 2, 0]
-                w_2 = avg_cost[index - 1, 3] / avg_cost[index - 2, 3]
-                w_3 = avg_cost[index - 1, 6] / avg_cost[index - 2, 6]
-                lambda_weight[0, index] = 3 * np.exp(w_1 / T) / (np.exp(w_1 / T) + np.exp(w_2 / T) + np.exp(w_3 / T))
-                lambda_weight[1, index] = 3 * np.exp(w_2 / T) / (np.exp(w_1 / T) + np.exp(w_2 / T) + np.exp(w_3 / T))
-                lambda_weight[2, index] = 3 * np.exp(w_3 / T) / (np.exp(w_1 / T) + np.exp(w_2 / T) + np.exp(w_3 / T))
-
         # iteration for all batches
         multi_task_model.train()
         train_dataset = iter(train_loader)
-        conf_mat = ConfMatrix(13)
+        conf_mat = ConfMatrix(n_class)
         for k in range(train_batch):
             train_data, train_label, train_depth, train_normal = train_dataset.next()
             train_data, train_label = train_data.to(device), train_label.long().to(device)
             train_depth, train_normal = train_depth.to(device), train_normal.to(device)
 
-            train_pred, logsigma = multi_task_model(train_data)
+            train_pred = multi_task_model(train_data)
+            # print('output predicted')
 
             optimizer.zero_grad()
             train_loss = [model_fit(train_pred[0], train_label, 'semantic'),
                           model_fit(train_pred[1], train_depth, 'depth'),
                           model_fit(train_pred[2], train_normal, 'normal')]
 
-            if opt.weight == 'equal' or opt.weight == 'dwa':
-                loss = sum([lambda_weight[i, index] * train_loss[i] for i in range(3)])
-            else:
-                loss = sum(1 / (2 * torch.exp(logsigma[i])) * train_loss[i] + logsigma[i] / 2 for i in range(3))
+            # print('loss calculated')
+
+            loss = sum(train_loss[i] for i in range(3))
 
             loss.backward()
             optimizer.step()
+
+            # print('backprop done')
 
             # accumulate label prediction for every pixel in training images
             conf_mat.update(train_pred[0].argmax(1).flatten(), train_label.flatten())
@@ -131,12 +119,14 @@ def multi_task_trainer(train_loader, test_loader, multi_task_model, device, opti
             cost[7], cost[8], cost[9], cost[10], cost[11] = normal_error(train_pred[2], train_normal)
             avg_cost[index, :12] += cost[:12] / train_batch
 
+            # print('cost calculated')
+
         # compute mIoU and acc
         avg_cost[index, 1:3] = np.array(conf_mat.get_metrics())
 
         # evaluating test data
         multi_task_model.eval()
-        conf_mat = ConfMatrix(13)
+        conf_mat = ConfMatrix(n_class)
         with torch.no_grad():  # operations inside don't track history
             test_dataset = iter(test_loader)
             for k in range(test_batch):
@@ -144,7 +134,7 @@ def multi_task_trainer(train_loader, test_loader, multi_task_model, device, opti
                 test_data, test_label = test_data.to(device), test_label.long().to(device)
                 test_depth, test_normal = test_depth.to(device), test_normal.to(device)
 
-                test_pred, _ = multi_task_model(test_data)
+                test_pred = multi_task_model(test_data)
                 test_loss = [model_fit(test_pred[0], test_label, 'semantic'),
                              model_fit(test_pred[1], test_depth, 'depth'),
                              model_fit(test_pred[2], test_normal, 'normal')]
