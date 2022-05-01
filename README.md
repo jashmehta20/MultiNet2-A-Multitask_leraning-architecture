@@ -13,6 +13,10 @@ To run any multinet:
     <br>
 </p>
 
+<p align = "center">
+    <img src = "./Results/multitask_vgg_fcn8.jpg">
+    <br>
+</p>
 ## Citation
 ```
 @inproceedings{liu2019end,
