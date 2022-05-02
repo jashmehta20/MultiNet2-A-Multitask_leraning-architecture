@@ -10,7 +10,7 @@ class MultiNetFCN8(nn.Module):
         super(MultiNetFCN8, self).__init__()
         self.n_class = n_class
         self.pretrained_net = pretrained_net
-        self.seg_block = SegmentationDecoderFCN8s(n_class)
+        self.seg_block = SegmentationDecoderFCN8s(n_class=n_class)
         self.depth_block = DepthDecoderFCN8s()
         self.normal_block = NormalDecoderFCN8s()
 

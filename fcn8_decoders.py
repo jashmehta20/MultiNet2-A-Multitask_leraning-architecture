@@ -4,8 +4,12 @@ import torch.nn.functional as F
 
 class SegmentationDecoderFCN8s(nn.Module):
 
-    def __init__(self, n_class) -> None:
+    def __init__(self, model=None, n_class=13) -> None:
         super(SegmentationDecoderFCN8s, self).__init__()
+        if model is not None:
+            self.pretrained_net = model
+        else:
+            self.pretrained_net=None
         self.relu    = nn.ReLU(inplace=True)
         self.deconv1 = nn.ConvTranspose2d(512, 512, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
         self.bn1     = nn.BatchNorm2d(512)
@@ -20,9 +24,16 @@ class SegmentationDecoderFCN8s(nn.Module):
         self.classifier = nn.Conv2d(32, n_class, kernel_size=1)
 
     def forward(self, x):
-        x5 = x['x5']  # size=(N, 512, x.H/32, x.W/32)
-        x4 = x['x4']  # size=(N, 512, x.H/16, x.W/16)
-        x3 = x['x3']  # size=(N, 256, x.H/8,  x.W/8)
+        if self.pretrained_net is None:
+            x5 = x['x5']  # size=(N, 512, x.H/32, x.W/32)
+            x4 = x['x4']  # size=(N, 512, x.H/16, x.W/16)
+            x3 = x['x3']  # size=(N, 256, x.H/8,  x.W/8)
+        
+        else:
+            x = self.pretrained_net(x)
+            x5 = x['x5']  # size=(N, 512, x.H/32, x.W/32)
+            x4 = x['x4']  # size=(N, 512, x.H/16, x.W/16)
+            x3 = x['x3']  # size=(N, 256, x.H/8,  x.W/8)
 
         score = self.relu(self.deconv1(x5))               # size=(N, 512, x.H/16, x.W/16)
         score = self.bn1(score + x4)                      # element-wise add, size=(N, 512, x.H/16, x.W/16)
@@ -38,8 +49,12 @@ class SegmentationDecoderFCN8s(nn.Module):
 
 class DepthDecoderFCN8s(nn.Module):
 
-    def __init__(self) -> None:
+    def __init__(self, model=None) -> None:
         super(DepthDecoderFCN8s, self).__init__()
+        if model is not None:
+            self.pretrained_net = model
+        else:
+            self.pretrained_net=None
         self.relu    = nn.ReLU(inplace=True)
         self.deconv1 = nn.ConvTranspose2d(512, 512, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
         self.bn1     = nn.BatchNorm2d(512)
@@ -54,9 +69,16 @@ class DepthDecoderFCN8s(nn.Module):
         self.classifier = nn.Conv2d(32, 1, kernel_size=1)
 
     def forward(self, x):
-        x5 = x['x5']  # size=(N, 512, x.H/32, x.W/32)
-        x4 = x['x4']  # size=(N, 512, x.H/16, x.W/16)
-        x3 = x['x3']  # size=(N, 256, x.H/8,  x.W/8)
+        if self.pretrained_net is None:
+            x5 = x['x5']  # size=(N, 512, x.H/32, x.W/32)
+            x4 = x['x4']  # size=(N, 512, x.H/16, x.W/16)
+            x3 = x['x3']  # size=(N, 256, x.H/8,  x.W/8)
+        
+        else:
+            x = self.pretrained_net(x)
+            x5 = x['x5']  # size=(N, 512, x.H/32, x.W/32)
+            x4 = x['x4']  # size=(N, 512, x.H/16, x.W/16)
+            x3 = x['x3']  # size=(N, 256, x.H/8,  x.W/8)
 
         score = self.relu(self.deconv1(x5))               # size=(N, 512, x.H/16, x.W/16)
         score = self.bn1(score + x4)                      # element-wise add, size=(N, 512, x.H/16, x.W/16)
@@ -70,8 +92,12 @@ class DepthDecoderFCN8s(nn.Module):
 
 class NormalDecoderFCN8s(nn.Module):
 
-    def __init__(self) -> None:
+    def __init__(self, model=None) -> None:
         super(NormalDecoderFCN8s, self).__init__()
+        if model is not None:
+            self.pretrained_net = model
+        else:
+            self.pretrained_net=None
         self.relu    = nn.ReLU(inplace=True)
         self.deconv1 = nn.ConvTranspose2d(512, 512, kernel_size=3, stride=2, padding=1, dilation=1, output_padding=1)
         self.bn1     = nn.BatchNorm2d(512)
@@ -86,6 +112,8 @@ class NormalDecoderFCN8s(nn.Module):
         self.classifier = nn.Conv2d(32, 3, kernel_size=1)
 
     def forward(self, x):
+        if self.pretrained_net is not None:
+            x = self.pretrained_net(x)
         x5 = x['x5']  # size=(N, 512, x.H/32, x.W/32)
         x4 = x['x4']  # size=(N, 512, x.H/16, x.W/16)
         x3 = x['x3']  # size=(N, 256, x.H/8,  x.W/8)
