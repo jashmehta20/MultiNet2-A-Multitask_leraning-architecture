@@ -8,7 +8,6 @@ Download pre-processed `NYUv2` dataset [here](https://www.dropbox.com/sh/86nssgw
 Dataroot should be like this:
 
 data
-
 ├───train
 │   ├───depth
 │   ├───image
@@ -19,6 +18,15 @@ data
     ├───image
     ├───label
     |───normal
+    
+├───Data  
+│   ├───cats  
+│   │       img1.jpg  
+│   │       img2.jpg  
+│   │  
+│   ├───dogs  
+│   │       img1.jpg  
+│   │       img2.jpg 
 
 
 To run any multinet: 
