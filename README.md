@@ -7,6 +7,9 @@ Download pre-processed `NYUv2` dataset [here](https://www.dropbox.com/sh/86nssgw
 To run any multinet: 
 `python3 train_multinet.py --dataroot /data --apply_augmentation --ckpt_dir /ckpt --epochs 200 --batch_size 4 --backbone resnet101 --architecture fcn`
 
+To run SingleNet:
+`python3 train_singlenet.py --dataroot /data --apply_augmentation --ckpt_dir /ckpt_dir --epochs 200 --batch_size 4 --backbone resnet101 --task semantic`
+
 ## Results
 <p align = "center">
     <img src = "./Results/Multitask_resnet_fcn8.jpg">
