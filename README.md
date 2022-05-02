@@ -7,17 +7,17 @@ This repository contains the source code of Multinet.
 Download pre-processed `NYUv2` dataset [here](https://www.dropbox.com/sh/86nssgwm6hm3vkb/AACrnUQ4GxpdrBbLjb6n-mWNa?dl=0) which we evaluated in the paper.
 Dataroot should be like this:
 
-data
-├───train
-│   ├───depth
-│   ├───image
-│   ├───label
-│   |───normal
-|───val
-    ├───depth
-    ├───image
-    ├───label
-    |───normal
+data  
+├───train   
+│   ├───depth    
+│   ├───image  
+│   ├───label  
+│   |───normal  
+|───val  
+    ├───depth  
+    ├───image  
+    ├───label  
+    |───normal  
     
 ├───Data  
 │   ├───cats  
