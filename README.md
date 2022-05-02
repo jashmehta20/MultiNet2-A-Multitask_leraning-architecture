@@ -8,6 +8,7 @@ Download pre-processed `NYUv2` dataset [here](https://www.dropbox.com/sh/86nssgw
 Dataroot should be like this:
 
 data
+
 ├───train
 │   ├───depth
 │   ├───image
