@@ -3,6 +3,7 @@ import torch.nn.functional as F
 import numpy as np
 import os
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 """
 Define task metrics, loss functions and model trainer here.
 """
@@ -82,13 +83,14 @@ def multi_net_trainer(train_loader, test_loader, multi_task_model, device, optim
     avg_cost = np.zeros([opt.epochs, 24], dtype=np.float32)
     print("starting training")
     for index in range(opt.epochs):
+        loop = tqdm(train_loader)
         cost = np.zeros(24, dtype=np.float32)
         # iteration for all batches
         multi_task_model.train()
         train_dataset = iter(train_loader)
         conf_mat = ConfMatrix(n_class)
-        for k in range(train_batch):
-            train_data, train_label, train_depth, train_normal = train_dataset.next()
+        for train_data, train_label, train_depth, train_normal in loop:
+
             train_data, train_label = train_data.to(device), train_label.long().to(device)
             train_depth, train_normal = train_depth.to(device), train_normal.to(device)
 
@@ -118,7 +120,8 @@ def multi_net_trainer(train_loader, test_loader, multi_task_model, device, optim
             cost[6] = train_loss[2].item()
             cost[7], cost[8], cost[9], cost[10], cost[11] = normal_error(train_pred[2], train_normal)
             avg_cost[index, :12] += cost[:12] / train_batch
-
+            loop.set_description(f"Epoch [{index}/{opt.epochs}]")
+            loop.set_postfix(loss=loss.item())
             # print('cost calculated')
 
         # compute mIoU and acc

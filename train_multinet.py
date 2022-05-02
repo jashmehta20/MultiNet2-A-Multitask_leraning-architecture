@@ -1,6 +1,6 @@
 import torch
 from encoders import VGGNet, ResNet101
-from multinet import MultiNetFCN8, MultiNetFCN
+from multinet import MultiNetFCN8
 from torch import optim
 from dataset import NYUv2
 from multinet_utils import *
@@ -61,6 +61,9 @@ nyuv2_test_loader = torch.utils.data.DataLoader(
     shuffle=False)
 
 print("dataset created")
+print(f"No of epochs: {opt.epochs}")
+print(f"Batch size: {opt.batch_size}")
+print(f"Model Backbone: {opt.backbone}")
 print(f"model parameters = {sum(i.numel() for i in model2.parameters())}")
 
 multi_net_trainer(nyuv2_train_loader,
