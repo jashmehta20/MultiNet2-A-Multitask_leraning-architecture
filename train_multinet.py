@@ -27,12 +27,8 @@ if opt.backbone == 'resnet101':
 elif opt.backbone == 'vgg16':
     pretrained_model = VGGNet()
 
-model = VGGNet()
 if opt.architecture == 'fcn8':
     model2 = MultiNetFCN8(pretrained_model, 13).cuda()
-
-elif opt.architecture == 'fcn':
-    model2 = MultiNetFCN(pretrained_model, 13).cuda()
 
 print("Model created")
 if opt.resume:

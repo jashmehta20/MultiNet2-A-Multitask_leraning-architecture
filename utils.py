@@ -3,6 +3,7 @@ import torch.nn.functional as F
 import numpy as np
 import os
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 """
 Define task metrics, loss functions and model trainer here.
 """
@@ -183,14 +184,14 @@ def single_task_trainer(train_loader, test_loader, single_task_model, device, op
     test_batch = len(test_loader)
     avg_cost = np.zeros([total_epoch, 24], dtype=np.float32)
     for index in range(total_epoch):
+        loop = tqdm(train_loader)
         cost = np.zeros(24, dtype=np.float32)
 
         # iteration for all batches
         single_task_model.train()
-        train_dataset = iter(train_loader)
+
         conf_mat = ConfMatrix(n_class)
-        for k in range(train_batch):
-            train_data, train_label, train_depth, train_normal = train_dataset.next()
+        for train_data, train_label, train_depth, train_normal in loop:
             train_data, train_label = train_data.to(device), train_label.long().to(device)
             train_depth, train_normal = train_depth.to(device), train_normal.to(device)
 

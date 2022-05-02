@@ -87,7 +87,6 @@ def multi_net_trainer(train_loader, test_loader, multi_task_model, device, optim
         cost = np.zeros(24, dtype=np.float32)
         # iteration for all batches
         multi_task_model.train()
-        train_dataset = iter(train_loader)
         conf_mat = ConfMatrix(n_class)
         for train_data, train_label, train_depth, train_normal in loop:
 
@@ -120,6 +119,7 @@ def multi_net_trainer(train_loader, test_loader, multi_task_model, device, optim
             cost[6] = train_loss[2].item()
             cost[7], cost[8], cost[9], cost[10], cost[11] = normal_error(train_pred[2], train_normal)
             avg_cost[index, :12] += cost[:12] / train_batch
+
             loop.set_description(f"Epoch [{index}/{opt.epochs}]")
             loop.set_postfix(loss=loss.item())
             # print('cost calculated')
@@ -128,12 +128,13 @@ def multi_net_trainer(train_loader, test_loader, multi_task_model, device, optim
         avg_cost[index, 1:3] = np.array(conf_mat.get_metrics())
 
         # evaluating test data
+        print("satrting validation")
         multi_task_model.eval()
         conf_mat = ConfMatrix(n_class)
         with torch.no_grad():  # operations inside don't track history
-            test_dataset = iter(test_loader)
-            for k in range(test_batch):
-                test_data, test_label, test_depth, test_normal = test_dataset.next()
+            loop = tqdm(test_loader)
+            for test_data, test_label, test_depth, test_normal in loop:
+
                 test_data, test_label = test_data.to(device), test_label.long().to(device)
                 test_depth, test_normal = test_depth.to(device), test_normal.to(device)
 
@@ -177,13 +178,12 @@ def single_task_trainer(train_loader, test_loader, single_task_model, device, op
     avg_cost = np.zeros([total_epoch, 24], dtype=np.float32)
     for index in range(total_epoch):
         cost = np.zeros(24, dtype=np.float32)
-
+        loop = tqdm(train_loader)
         # iteration for all batches
         single_task_model.train()
         train_dataset = iter(train_loader)
         conf_mat = ConfMatrix(n_class)
-        for k in range(train_batch):
-            train_data, train_label, train_depth, train_normal = train_dataset.next()
+        for  train_data, train_label, train_depth, train_normal in loop:
             train_data, train_label = train_data.to(device), train_label.long().to(device)
             train_depth, train_normal = train_depth.to(device), train_normal.to(device)
 
@@ -213,17 +213,20 @@ def single_task_trainer(train_loader, test_loader, single_task_model, device, op
                 cost[7], cost[8], cost[9], cost[10], cost[11] = normal_error(train_pred, train_normal)
 
             avg_cost[index, :12] += cost[:12] / train_batch
+            loop.set_description(f"Epoch [{index}/{total_epoch}]")
+            loop.set_postfix(loss=train_loss.item())
 
         if task == 'semantic':
             avg_cost[index, 1:3] = np.array(conf_mat.get_metrics())
 
         # evaluating test data
+        print('starting validation')
         single_task_model.eval()
         conf_mat = ConfMatrix(n_class)
         with torch.no_grad():  # operations inside don't track history
             test_dataset = iter(test_loader)
-            for k in range(test_batch):
-                test_data, test_label, test_depth, test_normal = test_dataset.next()
+            loop = tqdm(test_loader)
+            for test_data, test_label, test_depth, test_normal in loop:
                 test_data, test_label = test_data.to(device),  test_label.long().to(device)
                 test_depth, test_normal = test_depth.to(device), test_normal.to(device)
 

@@ -75,8 +75,3 @@ class NYUv2(Dataset):
 
     def __len__(self):
         return self.data_len
-
-import matplotlib.pyplot as plt
-import numpy as np
-ds = NYUv2(root=r"C:\Users\neetm\Desktop\DL\mtan\nyu\nyuv2", train=False)
-len(ds)
