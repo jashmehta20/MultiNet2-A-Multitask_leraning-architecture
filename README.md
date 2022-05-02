@@ -19,14 +19,6 @@ data
     ├───label  
     |───normal  
     
-├───Data  
-│   ├───cats  
-│   │       img1.jpg  
-│   │       img2.jpg  
-│   │  
-│   ├───dogs  
-│   │       img1.jpg  
-│   │       img2.jpg 
 
 
 To run any multinet: 
