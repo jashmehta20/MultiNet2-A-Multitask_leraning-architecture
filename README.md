@@ -12,12 +12,12 @@ data
 │   ├───depth
 │   ├───image
 │   ├───label
-│   └───normal
-└───val
+│   |───normal
+|───val
     ├───depth
     ├───image
     ├───label
-    └───normal
+    |───normal
 To run any multinet: 
 `python3 train_multinet.py --dataroot /data --apply_augmentation --ckpt_dir /ckpt --epochs 200 --batch_size 4 --backbone resnet101 --architecture fcn`
 
